@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TerraVision — AI Satellite Analysis</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ══════════════ LANDING ══════════════ -->
+  <div id="landing" class="screen active">
+    <nav class="nav">
+      <div class="nav-brand">
+        <div class="nav-globe">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <circle cx="11" cy="11" r="9.5" stroke="var(--accent)" stroke-width="1.5"/>
+            <ellipse cx="11" cy="11" rx="4.2" ry="9.5" stroke="var(--accent)" stroke-width="1.2"/>
+            <line x1="1.5" y1="11" x2="20.5" y2="11" stroke="var(--accent)" stroke-width="1.2"/>
+            <line x1="3" y1="6.5" x2="19" y2="6.5" stroke="var(--accent)" stroke-width="0.8" stroke-dasharray="2 1"/>
+            <line x1="3" y1="15.5" x2="19" y2="15.5" stroke="var(--accent)" stroke-width="0.8" stroke-dasharray="2 1"/>
+          </svg>
+        </div>
+        <span class="nav-name">TerraVision</span>
+      </div>
+      <div class="nav-pill">AI Satellite Analysis</div>
+    </nav>
+
+    <div class="land-body">
+      <div class="land-left">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span> Earth Observation Platform
+        </div>
+        <h1 class="hero-h1">
+          See how the Earth<br/>
+          <em>changes over time</em>
+        </h1>
+        <p class="hero-p">
+          Select any region on the map, choose a time range, and let Groq AI analyse
+          before &amp; after satellite imagery — uncovering deforestation, urban growth,
+          water changes, and environmental shifts with precision.
+        </p>
+        <button class="btn-primary" id="openMapBtn">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <rect x="1.5" y="3" width="13" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M5.5 3V13M10.5 3V13" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M1.5 8H14.5" stroke="currentColor" stroke-width="1.2"/>
+          </svg>
+          Open Map &amp; Start Analysis
+        </button>
+        <div class="hero-stats">
+          <div class="hstat"><b>10m</b><span>Sentinel-2 Resolution</span></div>
+          <div class="hstat-sep"></div>
+          <div class="hstat"><b>2015+</b><span>Satellite Archive</span></div>
+          <div class="hstat-sep"></div>
+          <div class="hstat"><b>Groq</b><span>Vision AI Engine</span></div>
+        </div>
+      </div>
+
+      <div class="land-right">
+        <div class="preview-card">
+          <div class="pc-titlebar">
+            <div class="pc-dots"><span></span><span></span><span></span></div>
+            <span class="pc-title">Change Detection Report</span>
+          </div>
+          <div class="pc-body">
+            <div class="pc-img-row">
+              <div class="pc-img-block">
+                <div class="pc-img-label">BEFORE · 2019</div>
+                <div class="pc-img-grid">
+                  <div class="pc-cell forest"></div><div class="pc-cell forest-light"></div>
+                  <div class="pc-cell forest"></div><div class="pc-cell water"></div>
+                  <div class="pc-cell forest-light"></div><div class="pc-cell forest"></div>
+                  <div class="pc-cell water"></div><div class="pc-cell forest"></div>
+                  <div class="pc-cell forest-light"></div>
+                </div>
+              </div>
+              <div class="pc-arrow">→</div>
+              <div class="pc-img-block">
+                <div class="pc-img-label">AFTER · 2024</div>
+                <div class="pc-img-grid">
+                  <div class="pc-cell urban"></div><div class="pc-cell urban-light"></div>
+                  <div class="pc-cell forest-light"></div><div class="pc-cell urban"></div>
+                  <div class="pc-cell urban-light"></div><div class="pc-cell urban"></div>
+                  <div class="pc-cell water"></div><div class="pc-cell urban-light"></div>
+                  <div class="pc-cell urban"></div>
+                </div>
+              </div>
+            </div>
+            <div class="pc-findings">
+              <div class="pc-finding">
+                <span class="pf-badge high">HIGH</span>
+                <span>Urban expansion detected: +34%</span>
+              </div>
+              <div class="pc-finding">
+                <span class="pf-badge mod">MOD</span>
+                <span>Forest cover reduced by 18%</span>
+              </div>
+              <div class="pc-finding">
+                <span class="pf-badge low">LOW</span>
+                <span>Water body area remains stable</span>
+              </div>
+            </div>
+            <div class="pc-footer">
+              <span class="pc-ai">⚡ Groq AI · Llama 4 Scout</span>
+              <span class="pc-conf">94% confidence</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ MAP SCREEN ══════════════ -->
+  <div id="mapScreen" class="screen">
+    <div class="topbar">
+      <button class="btn-back" id="backBtn">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M9 2L4 7L9 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back
+      </button>
+
+      <div class="topbar-mid">
+        <span class="topbar-brand">TerraVision</span>
+        <span class="topbar-hint" id="mapHint">Draw a rectangle on the map to select your region</span>
+      </div>
+
+      <div class="topbar-right">
+        <div class="date-row">
+          <label class="date-lbl">FROM
+            <input type="date" id="dateFrom" class="date-in" />
+          </label>
+          <label class="date-lbl">TO
+            <input type="date" id="dateTo" class="date-in" />
+          </label>
+        </div>
+        <button class="btn-analyse" id="analyseBtn" disabled>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 7C2 4.24 4.24 2 7 2C9.76 2 12 4.24 12 7C12 9.76 9.76 12 7 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M7 9L10 12L13 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Analyse Area
+        </button>
+      </div>
+    </div>
+
+    <div id="map"></div>
+
+    <div class="sel-card" id="selectionCard">
+      <div class="sel-head">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <rect x="0.75" y="0.75" width="11.5" height="11.5" rx="1" stroke="var(--accent)" stroke-width="1.2" stroke-dasharray="2.5 1.5"/>
+        </svg>
+        Selected Region
+      </div>
+      <div class="sel-rows">
+        <div class="sel-row"><span>NW</span><code id="coordNW">—</code></div>
+        <div class="sel-row"><span>SE</span><code id="coordSE">—</code></div>
+        <div class="sel-row"><span>Area</span><code id="areaKm">—</code></div>
+      </div>
+      <p class="sel-tip">Keep selection under 100 km² for best quality</p>
+    </div>
+
+    <div class="layer-switcher" id="layerSwitcher">
+      <button class="ls-btn active" data-layer="satellite">🛰 Satellite</button>
+      <button class="ls-btn" data-layer="street">🗺 Street</button>
+    </div>
+  </div>
+
+  <!-- ══════════════ ANALYSIS SCREEN ══════════════ -->
+  <div id="analysisScreen" class="screen">
+    <div class="analysis-topbar">
+      <button class="btn-back" id="backFromAnalysis">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M9 2L4 7L9 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        New Analysis
+      </button>
+      <span class="topbar-brand">TerraVision</span>
+      <button class="btn-export hidden" id="exportBtn">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M6.5 1V8.5M6.5 8.5L4 6M6.5 8.5L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M1 10.5V12H12V10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Export PDF
+      </button>
+    </div>
+
+    <div class="analysis-body" id="analysisBody">
+
+      <!-- Loading -->
+      <div id="loadingState" class="load-wrap">
+        <div class="load-orb">
+          <div class="lo-ring lo-r1"></div>
+          <div class="lo-ring lo-r2"></div>
+          <div class="lo-ring lo-r3"></div>
+          <div class="lo-core">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="var(--accent)" stroke-width="1.5"/>
+              <ellipse cx="12" cy="12" rx="4.5" ry="10" stroke="var(--accent)" stroke-width="1.2"/>
+              <line x1="2" y1="12" x2="22" y2="12" stroke="var(--accent)" stroke-width="1.2"/>
+            </svg>
+          </div>
+        </div>
+        <h2 class="load-title" id="loadingTitle">Fetching Satellite Imagery</h2>
+        <p class="load-sub" id="loadingSubtext">Querying Google Earth Engine archive…</p>
+        <div class="load-steps">
+          <div class="ls-step" id="lstep1"><div class="ls-num">1</div><span>Fetching historical images (GEE / NASA GIBS)</span></div>
+          <div class="ls-step" id="lstep2"><div class="ls-num">2</div><span>Processing Sentinel-2 satellite composites</span></div>
+          <div class="ls-step" id="lstep3"><div class="ls-num">3</div><span>Running Groq AI vision analysis</span></div>
+          <div class="ls-step" id="lstep4"><div class="ls-num">4</div><span>Generating change detection report</span></div>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div id="resultsState" class="results-wrap hidden">
+
+        <div class="meta-bar">
+          <div class="mb-item"><div class="mb-label">Region</div><div class="mb-val" id="res-coords">—</div></div>
+          <div class="mb-sep"></div>
+          <div class="mb-item"><div class="mb-label">Time Period</div><div class="mb-val" id="res-period">—</div></div>
+          <div class="mb-sep"></div>
+          <div class="mb-item"><div class="mb-label">Data Source</div><div class="mb-val" id="res-source">—</div></div>
+          <div class="mb-sep"></div>
+          <div class="mb-item"><div class="mb-label">Change Severity</div><div class="mb-val"><span id="res-severity" class="sev-pill">—</span></div></div>
+        </div>
+
+        <!-- Images -->
+        <div class="img-section">
+          <div class="sec-heading">
+            <span class="sec-icon">📡</span>
+            <span>Satellite Image Comparison</span>
+          </div>
+          <div class="img-pair">
+            <div class="img-card">
+              <div class="img-card-top">
+                <span class="img-badge before-badge">BEFORE</span>
+                <span class="img-date" id="beforeDateLabel">—</span>
+              </div>
+              <div class="img-box">
+                <img id="beforeImg" src="" alt="Before satellite image" />
+                <div class="img-overlay-src" id="beforeSrc">NASA GIBS · MODIS</div>
+                <div class="img-spinner-wrap" id="beforeSpinner"><div class="spin"></div></div>
+              </div>
+            </div>
+
+            <div class="img-arrow">
+              <div class="ia-line"></div>
+              <div class="ia-circle">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M3 7H11M11 7L7.5 3.5M11 7L7.5 10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="ia-line"></div>
+            </div>
+
+            <div class="img-card">
+              <div class="img-card-top">
+                <span class="img-badge after-badge">AFTER</span>
+                <span class="img-date" id="afterDateLabel">—</span>
+              </div>
+              <div class="img-box">
+                <img id="afterImg" src="" alt="After satellite image" />
+                <div class="img-overlay-src" id="afterSrc">NASA GIBS · MODIS</div>
+                <div class="img-spinner-wrap" id="afterSpinner"><div class="spin"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Report -->
+        <div class="report-wrap">
+          <div class="sec-heading">
+            <span class="sec-icon">🤖</span>
+            <span>AI Change Detection Report</span>
+            <span class="model-badge">Groq · Llama 4 Scout</span>
+          </div>
+
+          <div class="rcard summary-card">
+            <div class="rcard-head"><span class="rcard-ico">📋</span> Executive Summary</div>
+            <p id="summaryText">—</p>
+          </div>
+
+          <div class="two-col">
+            <div class="rcard">
+              <div class="rcard-head"><span class="rcard-ico">🔍</span> Detected Changes</div>
+              <ul id="changesList" class="change-list"></ul>
+            </div>
+            <div class="rcard">
+              <div class="rcard-head"><span class="rcard-ico">📊</span> Quantitative Metrics</div>
+              <div id="metricsList" class="metrics-wrap"></div>
+            </div>
+          </div>
+
+          <div class="rcard">
+            <div class="rcard-head"><span class="rcard-ico">🌱</span> Environmental Impact</div>
+            <p id="environmentalText">—</p>
+          </div>
+
+          <div class="rcard">
+            <div class="rcard-head"><span class="rcard-ico">📝</span> Detailed Analysis</div>
+            <div id="fullAnalysis" class="detail-body"></div>
+          </div>
+
+          <div class="raw-section">
+            <button class="raw-btn" id="toggleRaw">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                <path d="M1.5 3.5L5.5 7.5L9.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              Show Raw AI Response
+            </button>
+            <pre id="rawResponse" class="raw-pre hidden"></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div id="errorState" class="err-wrap hidden">
+        <div class="err-icon">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="17" stroke="var(--danger)" stroke-width="1.5"/>
+            <path d="M20 11V22" stroke="var(--danger)" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="20" cy="28" r="2" fill="var(--danger)"/>
+          </svg>
+        </div>
+        <h2 class="err-title">Analysis Failed</h2>
+        <p class="err-msg" id="errorMsg">Something went wrong. Please try again.</p>
+        <button class="btn-primary" id="retryBtn">Try Again</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/analysis.js"></script>
+</body>
+</html>

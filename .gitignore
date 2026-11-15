@@ -1,0 +1,6 @@
+node_modules/
+.env
+*.pyc
+__pycache__/
+gee-key.json
+.DS_Store
